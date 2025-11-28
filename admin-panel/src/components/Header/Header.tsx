@@ -5,9 +5,9 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import { Button, Container } from "@mui/material";
-// import logo from "../../../src/assets/images/logs/logoImage.svg";
+import logo from "../../assets/images/logs/logoImage.svg"
 import user from "../../assets/images/users/Frame (1).svg";
-const logo = "";
+
 const menuItems = [
   { label: "Home", weight: 700, size: "16px", path: "/" },
   { label: "About Us", weight: 400, size: "16px", path: "/about" },
