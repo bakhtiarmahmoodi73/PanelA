@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import login from "../../src/assets/images/logs/login.svg";
+import reg from "../assets/images/register/register.svg"
 import {
   Box,
   Card,
@@ -74,7 +74,7 @@ const LoginCard: React.FC = () => {
       <Box component="form" onSubmit={handleLogin}>
         <Box
           component="img"
-          src={login}
+          src={reg}
           alt="Login Logo"
           sx={{
             width: "100%",
