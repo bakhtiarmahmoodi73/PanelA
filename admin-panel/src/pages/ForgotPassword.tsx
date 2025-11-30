@@ -1,133 +1,263 @@
-// src/pages/ForgotPasswordPage/ForgotPasswordPage.tsx
-import React, { useState } from "react";
+import React from "react";
+import { useFormik } from "formik";
+import { z } from "zod";
 import {
   Box,
   Card,
   TextField,
   Button,
   Typography,
+  Alert,
+  Snackbar,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
+import { Cancel } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import forgotPasswordImage from "../../src/assets/images/forgot/forget password.svg";
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState, AppDispatch } from '../store';
+import { sendResetPasswordEmail, clearError } from "../store/slices/forgotPasswordSlice";
+import forgotPasswordImage from "../assets/images/forgot/forget password.svg";
+
+// تعریف Schema با Zod
+const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, "The email is incorrect")
+    .email("The email is incorrect"),
+});
+
+// تعریف تایپ از روی Schema
+type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 const ForgotPasswordPage: React.FC = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState<string>("");
+  const dispatch = useDispatch<AppDispatch>();
+  const [showError, setShowError] = React.useState<boolean>(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setEmail(e.target.value);
+  const { isLoading, error, success } = useSelector((state: RootState) => state.forgotPassword);
+
+  // اگر ایمیل با موفقیت ارسال شد، به صفحه تغییر رمز هدایت شو
+  React.useEffect(() => {
+    if (success) {
+      navigate("/auth/change-password");
+    }
+  }, [success, navigate]);
+
+  // نمایش خطا هنگام تغییر
+  React.useEffect(() => {
+    if (error) {
+      setShowError(true);
+    }
+  }, [error]);
+
+  // Formik configuration با Zod
+  const formik = useFormik<ForgotPasswordFormData>({
+    initialValues: {
+      email: "",
+    },
+    validate: (values) => {
+      const result = forgotPasswordSchema.safeParse(values);
+      
+      if (!result.success) {
+        const errors: Record<string, string> = {};
+        result.error.issues.forEach((issue) => {
+          const path = issue.path[0] as string;
+          errors[path] = issue.message;
+        });
+        return errors;
+      }
+      
+      return {};
+    },
+    onSubmit: async (values) => {
+      try {
+        await dispatch(sendResetPasswordEmail(values.email)).unwrap();
+        console.log("Reset password email sent to:", values.email);
+      } catch (error) {
+        console.error("Failed to send reset email:", error);
+      }
+    },
+  });
+
+  const handleCloseError = (): void => {
+    setShowError(false);
+    dispatch(clearError());
   };
 
-  const handleConfirm = (e: React.FormEvent): void => {
-    e.preventDefault();
-    // منطق ارسال لینک بازیابی رمز عبور اینجا پیاده‌سازی می‌شود
-    console.log("Forgot password email:", email);
-    
-    // هدایت به صفحه تغییر رمز عبور
-    navigate("/auth/change-password");
+  const handleClearEmail = (): void => {
+    formik.setFieldValue("email", "");
+    formik.setFieldTouched("email", false);
   };
+
+  // بررسی آیا ایمیل خطا دارد و کاربر فیلد را لمس کرده
+  const hasEmailError = formik.touched.email && Boolean(formik.errors.email);
 
   return (
-    <Card
-      sx={{
-        display: "block",
-        maxWidth: "560px",
-        width: "100%",
-        height: "366px",
-        borderRadius: "30px",
-        marginTop: "234px",
-        marginBottom: "152px",
-        marginX: "auto",
-        backgroundColor: "#2A3342",
-        paddingBottom: "32px",
-      }}
-    >
-      <Box component="form" onSubmit={handleConfirm}>
-        {/* تصویر در بالای کارت */}
-        <Box
-          component="img"
-          src={forgotPasswordImage} 
-          alt="Forgot Password Logo"
-          sx={{
-            width: "100%",
-            maxWidth: "271px",
-            marginTop: "32px",
-            marginX: "auto",
-            display: "block",
-          }}
-        />
+    <>
+      <Snackbar 
+        open={showError} 
+        autoHideDuration={6000} 
+        onClose={handleCloseError}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
 
-        {/* فیلد Email */}
-        <Box sx={{ mt: "55px", ml: "38px", mr: "36px" }}>
-          <Typography
+      <Card
+        sx={{
+          display: "block",
+          maxWidth: "560px",
+          width: "100%",
+          height: "366px",
+          borderRadius: "30px",
+          marginTop: "234px",
+          marginBottom: "152px",
+          marginX: "auto",
+          backgroundColor: "#2A3342",
+          paddingBottom: "32px",
+        }}
+      >
+        <Box component="form" onSubmit={formik.handleSubmit} noValidate>
+          {/* تصویر در بالای کارت */}
+          <Box
+            component="img"
+            src={forgotPasswordImage} 
+            alt="Forgot Password Logo"
             sx={{
-              fontWeight: 700,
-              color: "#ABABAB",
-              fontSize: "16px",
-              mb: "15px"
-            }}
-          >
-            Email:
-          </Typography>
-          <TextField
-            fullWidth
-            name="email"
-            type="email"
-            placeholder="Please Enter Your Email"
-            value={email}
-            onChange={handleInputChange}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                height: "57px",
-                borderRadius: "10px",
-                fontSize: "14px",
-                fontWeight: 700,
-                color: "#FFFFFF",
-                backgroundColor: "#242C39",
-                "& fieldset": {
-                  borderColor: "transparent",
-                },
-                "&:hover fieldset": {
-                  borderColor: "#1D8D94",
-                },
-                "&.Mui-focused fieldset": {
-                  borderColor: "#1D8D94",
-                },
-              },
-              "& .MuiInputBase-input::placeholder": {
-                color: "#FFFFFF !important",
-                opacity: 1,
-              },
+              width: "100%",
+              maxWidth: "271px",
+              marginTop: "32px",
+              marginX: "auto",
+              display: "block",
             }}
           />
-        </Box>
 
-        {/* دکمه Confirm */}
-        <Button
-          type="submit"
-          fullWidth
-          sx={{
-            mt: "15px",
-            backgroundColor: "#1D8D94",
-            width:"485px",
-            height: "60px",
-            marginLeft: "39px",
-            marginRight: "36px",
-            borderRadius: "10px",
-            fontSize: "16px",
-            fontWeight: 700,
-            color: "#FFFFFF",
-            textTransform: "none",
-            boxShadow: "0 4px 8px rgba(29, 141, 148, 0.5)",
-            '&:hover': {
-              backgroundColor: "#16666c",
-            }
-          }}
-        >
-          Confirm
-        </Button>
-      </Box>
-    </Card>
+          {/* فیلد Email */}
+          <Box sx={{ mt: "55px", ml: "38px", mr: "36px" }}>
+            <Typography
+              sx={{
+                fontWeight: 700,
+                color: "#ABABAB",
+                fontSize: "16px",
+                mb: "15px"
+              }}
+            >
+              Email:
+            </Typography>
+            <TextField
+              fullWidth
+              name="email"
+              type="email"
+              placeholder="Please Enter Your Email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={hasEmailError}
+              helperText={hasEmailError && "The email is incorrect"}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  height: "57px",
+                  borderRadius: "10px",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  color: "#FFFFFF",
+                  backgroundColor: "#242C39",
+                  // حالت خطا - border قرمز
+                  "&.Mui-error": {
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#f44336 !important",
+                      borderWidth: "2px !important",
+                    },
+                  },
+                  // حالت نرمال
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "transparent",
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#1D8D94",
+                  },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "#1D8D94",
+                  },
+                },
+                "& .MuiInputBase-input::placeholder": {
+                  color: "#FFFFFF !important",
+                  opacity: 1,
+                },
+                "& .MuiFormHelperText-root": {
+                  color: "#f44336",
+                  marginLeft: "8px",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                },
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {/* نمایش آیکون ضربدر وقتی ایمیل نامعتبر است */}
+                    {hasEmailError && (
+                      <IconButton
+                        onClick={handleClearEmail}
+                        edge="end"
+                        sx={{ 
+                          width: "24px", 
+                          height: "24px", 
+                          color: "#f44336",
+                          mr: "10px",
+                          backgroundColor: "rgba(244, 67, 54, 0.1)",
+                          borderRadius: "50%",
+                          "&:hover": {
+                            backgroundColor: "rgba(244, 67, 54, 0.2)",
+                          },
+                          "& .MuiSvgIcon-root": {
+                            fontSize: "16px",
+                          }
+                        }}
+                        aria-label="Clear email"
+                      >
+                        <Cancel />
+                      </IconButton>
+                    )}
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+
+          {/* دکمه Confirm */}
+          <Button
+            type="submit"
+            disabled={isLoading}
+            sx={{
+              mt: "15px",
+              backgroundColor: "#1D8D94",
+              width: "485px",
+              height: "60px",
+              marginLeft: "39px",
+              marginRight: "36px",
+              borderRadius: "10px",
+              fontSize: "16px",
+              fontWeight: 700,
+              color: "#FFFFFF",
+              textTransform: "none",
+              boxShadow: "0 4px 8px rgba(29, 141, 148, 0.5)",
+              '&:hover': {
+                backgroundColor: "#16666c",
+              },
+              '&:disabled': {
+                backgroundColor: '#cccccc',
+                color: '#666666'
+              }
+            }}
+          >
+            {isLoading ? "Sending..." : "Confirm"}
+          </Button>
+        </Box>
+      </Card>
+    </>
   );
 };
 
