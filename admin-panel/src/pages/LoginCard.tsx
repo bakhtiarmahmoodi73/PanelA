@@ -15,11 +15,12 @@ import {
   Alert,
   Snackbar,
 } from "@mui/material";
-import { Visibility, VisibilityOff, Cancel } from "@mui/icons-material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from 'react-redux';
-import type { RootState, AppDispatch } from '../store';
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "../store";
 import { loginUser, clearError } from "../store/slices/authSlice";
+import closeImg from "../assets/images/errorcircle/Frame (2).svg";
 
 // تعریف Schema با Zod
 const loginSchema = z.object({
@@ -43,7 +44,9 @@ const LoginCard: React.FC = () => {
   const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const [showError, setShowError] = React.useState<boolean>(false);
 
-  const { isLoading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isLoading, error, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   // Redirect if authenticated
   React.useEffect(() => {
@@ -68,7 +71,7 @@ const LoginCard: React.FC = () => {
     },
     validate: (values) => {
       const result = loginSchema.safeParse(values);
-      
+
       if (!result.success) {
         const errors: Record<string, string> = {};
         result.error.issues.forEach((issue) => {
@@ -77,15 +80,17 @@ const LoginCard: React.FC = () => {
         });
         return errors;
       }
-      
+
       return {};
     },
     onSubmit: async (values) => {
       try {
-        await dispatch(loginUser({
-          email: values.email,
-          password: values.password
-        })).unwrap();
+        await dispatch(
+          loginUser({
+            email: values.email,
+            password: values.password,
+          })
+        ).unwrap();
       } catch (error) {
         console.error("Login failed:", error);
       }
@@ -120,13 +125,17 @@ const LoginCard: React.FC = () => {
 
   return (
     <>
-      <Snackbar 
-        open={showError} 
-        autoHideDuration={6000} 
+      <Snackbar
+        open={showError}
+        autoHideDuration={6000}
         onClose={handleCloseError}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert onClose={handleCloseError} severity="error" sx={{ width: '100%' }}>
+        <Alert
+          onClose={handleCloseError}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
           {error}
         </Alert>
       </Snackbar>
@@ -159,19 +168,6 @@ const LoginCard: React.FC = () => {
             }}
           />
 
-          {/* Email */}
-          <Typography
-            sx={{
-              mt: "31px",
-              fontWeight: 700,
-              color: "#ABABAB",
-              ml: "39px",
-              fontSize: "16px",
-            }}
-          >
-            Email&nbsp;:
-          </Typography>
-
           <TextField
             fullWidth
             name="email"
@@ -187,6 +183,14 @@ const LoginCard: React.FC = () => {
               mt: "15px",
               width: "485px",
               marginX: "auto",
+
+              "& input:-webkit-autofill": {
+                WebkitBoxShadow: "0 0 0 1000px #242C39 inset !important",
+                WebkitTextFillColor: "#FFFFFF !important",
+                caretColor: "#FFFFFF",
+                transition: "background-color 9999s ease-in-out 0s",
+              },
+
               "& .MuiOutlinedInput-root": {
                 height: "57px",
                 borderRadius: "10px",
@@ -194,14 +198,12 @@ const LoginCard: React.FC = () => {
                 fontWeight: 700,
                 color: "#FFFFFF",
                 backgroundColor: "#242C39",
-                // حالت خطا - border قرمز
-                "&.Mui-error": {
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#f44336 !important",
-                    borderWidth: "2px !important",
-                  },
+
+                "&.Mui-error .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#F66066 !important",
+                  borderWidth: "2px !important",
                 },
-                // حالت نرمال
+
                 "& .MuiOutlinedInput-notchedOutline": {
                   borderColor: "#444",
                 },
@@ -211,43 +213,54 @@ const LoginCard: React.FC = () => {
                 "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                   borderColor: "#1D8D94",
                 },
+
+                // جلوگیری از رنگ آبی هنگام فوکوس
+                "&.Mui-focused": {
+                  backgroundColor: "#242C39 !important",
+                },
               },
+
+              // Placeholder
               "& .MuiInputBase-input::placeholder": {
                 color: "#FFFFFF !important",
                 opacity: 1,
               },
+
+              // Error text
               "& .MuiFormHelperText-root": {
-                color: "#f44336",
-                marginLeft: "8px",
-                fontSize: "12px",
-                fontWeight: 700,
+                color: "F66066",
+                marginLeft: "0px",
+                marginTop: "5px",
+                fontSize: "14px",
+                fontWeight: 500,
+                fontFamily: "",
               },
             }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
-                  {/* نمایش آیکون ضربدر وقتی ایمیل نامعتبر است */}
                   {hasEmailError && (
                     <IconButton
                       onClick={handleClearEmail}
                       edge="end"
-                      sx={{ 
-                        width: "24px", 
-                        height: "24px", 
-                        color: "#f44336",
-                        mr: "10px",
-                        backgroundColor: "rgba(244, 67, 54, 0.1)",
-                        borderRadius: "50%",
-                        "&:hover": {
-                          backgroundColor: "rgba(244, 67, 54, 0.2)",
-                        },
-                        "& .MuiSvgIcon-root": {
-                          fontSize: "16px",
-                        }
+                      sx={{
+                        width: "20px",
+                        height: "20px",
+                        mr: "20px",
+                        p: 0,
+                        background: "none",
                       }}
                       aria-label="Clear email"
                     >
-                      <Cancel />
+                      <img
+                        src={
+                          typeof closeImg === "string"
+                            ? closeImg
+                            : (closeImg as any).src
+                        }
+                        alt="clear"
+                        style={{ width: "20px", height: "20px" }}
+                      />
                     </IconButton>
                   )}
                 </InputAdornment>
@@ -267,7 +280,7 @@ const LoginCard: React.FC = () => {
           >
             Password&nbsp;:
           </Typography>
-          
+
           <TextField
             fullWidth
             name="password"
@@ -292,7 +305,7 @@ const LoginCard: React.FC = () => {
                 backgroundColor: "#242C39",
                 "&.Mui-error": {
                   "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#f44336 !important",
+                    borderColor: "#F66066 !important",
                     borderWidth: "2px !important",
                   },
                 },
@@ -311,9 +324,12 @@ const LoginCard: React.FC = () => {
                 opacity: 1,
               },
               "& .MuiFormHelperText-root": {
-                color: "#f44336",
-                marginLeft: "8px",
-                fontSize: "12px",
+                color: "F66066",
+                marginLeft: "0px",
+                marginTop: "5px",
+                fontSize: "14px",
+                fontWeight: 500,
+                
               },
             }}
             InputProps={{
@@ -322,13 +338,15 @@ const LoginCard: React.FC = () => {
                   <IconButton
                     onClick={handleClickShowPassword}
                     edge="end"
-                    sx={{ 
-                      width: "16px", 
-                      height: "16px", 
+                    sx={{
+                      width: "16px",
+                      height: "16px",
                       color: "#ABABAB",
-                      mr: "21px" 
+                      mr: "21px",
                     }}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
@@ -400,7 +418,7 @@ const LoginCard: React.FC = () => {
                 marginRight: "36px",
                 cursor: "pointer",
                 textDecoration: "none",
-                '&:hover': {
+                "&:hover": {
                   textDecoration: "underline",
                 },
               }}
@@ -425,13 +443,10 @@ const LoginCard: React.FC = () => {
               color: "#FFFFFF",
               textTransform: "none",
               boxShadow: "0 4px 8px rgba(29, 141, 148, 0.5)",
-              '&:hover': {
+              "&:hover": {
                 backgroundColor: "#16666c",
               },
-              '&:disabled': {
-                backgroundColor: '#cccccc',
-                color: '#666666'
-              },
+             
             }}
           >
             {isLoading ? "Logging in..." : "Login"}
@@ -463,7 +478,7 @@ const LoginCard: React.FC = () => {
                 padding: "0px",
                 display: "inline",
                 verticalAlign: "baseline",
-                '&:hover': {
+                "&:hover": {
                   textDecoration: "underline",
                 },
               }}
