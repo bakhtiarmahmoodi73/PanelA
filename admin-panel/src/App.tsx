@@ -10,6 +10,7 @@ import LoginCard from "./pages/LoginCard";
 import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPassword";
 import ChangePasswordPage from "./pages/ChangePassword";
+import HomePage from "./pages/HomePage";
 function App() {
   return (
     <Provider store={store}>
@@ -18,7 +19,7 @@ function App() {
         <Router>
           <Layout>
             <Routes>
-              <Route path="/" element={<div>Home Page</div>} />
+              <Route path="/" element={<HomePage />} />
               <Route path="/dashboard" element={<div>Dashboard</div>} />
               <Route path="/auth/login" element={<LoginCard />} />{" "}
               {/* اضافه کنید */}
