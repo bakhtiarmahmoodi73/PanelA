@@ -13,7 +13,7 @@ function TopComponent() {
         borderRadius:"30px",
         borderColor:"#596B89"   
       }}>
-        <TopComponent />
+       
     </Container>
   )
 }
