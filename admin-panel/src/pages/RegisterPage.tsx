@@ -249,6 +249,7 @@ const RegisterPage: React.FC = () => {
             type="button"
             onClick={handleLoginClick}
             sx={{
+              all:"unset",
               textDecoration: "none",
               fontWeight: 700,
               color: "#1D8D94",

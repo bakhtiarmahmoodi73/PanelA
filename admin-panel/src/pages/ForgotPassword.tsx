@@ -111,13 +111,13 @@ const ForgotPasswordPage: React.FC = () => {
           display: "block",
           maxWidth: "560px",
           width: "100%",
-          height: "366px",
+          height:hasEmailError ? "405px" : "366px",
           borderRadius: "30px",
           marginTop: "234px",
           marginBottom: "152px",
           marginX: "auto",
           backgroundColor: "#2A3342",
-          paddingBottom: "32px",
+          
         }}
       >
         <Box component="form" onSubmit={formik.handleSubmit} noValidate>
@@ -253,30 +253,44 @@ const ForgotPasswordPage: React.FC = () => {
 
 
           {/* دکمه Confirm */}
-          <Button
-            type="submit"
-            disabled={isLoading}
-            sx={{
-              mt: "15px",
-              backgroundColor: "#1D8D94",
-              width: "485px",
-              height: "60px",
-              marginLeft: "39px",
-              marginRight: "36px",
-              borderRadius: "10px",
-              fontSize: "16px",
-              fontWeight: 700,
-              color: "#FFFFFF",
-              textTransform: "none",
-              boxShadow: "0 4px 8px rgba(29, 141, 148, 0.5)",
-              '&:hover': {
-                backgroundColor: "#16666c",
-              },
-             
-            }}
-          >
-            {isLoading ? "Sending..." : "Confirm"}
-          </Button>
+         <Button
+    type="submit"
+    disabled={isLoading}
+    disableRipple
+    disableElevation
+    sx={{
+        mt: "15px",
+        backgroundColor: "#1D8D94",
+        width: "485px",
+        height: "60px",
+        marginLeft: "39px",
+        marginRight: "36px",
+        borderRadius: "10px",
+        fontSize: "16px",
+        fontWeight: 700,
+        color: "#FFFFFF",
+        textTransform: "none",
+        boxShadow: "0 4px 8px rgba(29, 141, 148, 0.5)",
+        '&:hover': {
+            backgroundColor: "#16666c",
+            boxShadow: "0 4px 8px rgba(29, 141, 148, 0.5)",
+        },
+        '&:focus': {
+            outline: 'none',
+        },
+        '&:active': {
+            transform: 'none',
+            boxShadow: "0 4px 8px rgba(29, 141, 148, 0.5)",
+        },
+        '&.Mui-disabled': {
+            backgroundColor: "inherit",
+            color: "inherit",
+            boxShadow: "none",
+        }
+    }}
+>
+    {isLoading ? "Sending..." : "Confirm"}
+</Button>
         </Box>
       </Card>
     </>

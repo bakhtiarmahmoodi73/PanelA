@@ -19,13 +19,15 @@ const Footer = () => {
     >
       <Box
         sx={{
+          all: "unset",
+          display: "block",
           maxWidth: "1140px",
           margin: "0 auto",
           backgroundColor: "transparent",
           boxShadow: "none",
           background: "inherit",
           border: "none",
-          display: "flex",
+
           flexDirection: "column",
           alignItems: "center",
           position: "relative", // برای کنترل بهتر موقعیت
@@ -36,21 +38,20 @@ const Footer = () => {
           src={line}
           alt="line"
           sx={{
+            all: "unset", // پاک کردن همه استایل‌های اولیه
+            display: "block",
             width: "1140px", // طول خط 1140px
             height: "1px", // ارتفاع خط 1px
             backgroundColor: "#2E3E59",
             cursor: "pointer",
             marginBottom: "18px",
-            display: "block",
           }}
         />
         <Typography
-          
-          color="text.secondary"
           align="center"
           sx={{
-            fontSize:"12px",
-            color:"#ABABAB",
+            fontSize: "12px",
+            color: "#ABABAB",
             marginTop: 0,
             position: "relative",
           }}

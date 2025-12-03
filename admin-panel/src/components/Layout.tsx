@@ -1,36 +1,40 @@
 // src/components/Layout.tsx
-import { ReactNode } from 'react';
 import { Container, Box } from '@mui/material';
 import Header from './Header/Header';
 import Footer from './Footer/Footer';
+import { Outlet } from 'react-router-dom';
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-const Layout = ({ children }: LayoutProps) => {
+const Layout = () => {
   return (
     <Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100vh', // ارتفاع حداقل برابر صفحه
+        minHeight: '100vh',
+        m: 0,
+        p: 0,
       }}
     >
+      {/* همیشه Header */}
       <Header />
-      
-      <Container 
-        component="main" 
-        sx={{ 
-          flex: 1, // این باعث می‌شود main فضای باقیمانده را پر کند
-          py: 2,
+
+      {/* Main Content */}
+      <Container
+        component="main"
+        disableGutters
+        sx={{
+          flex: 1,
+          p: 0,         // بدون padding
+          m: 0,         // بدون margin
           width: '100%',
+          maxWidth: '100% !important',
         }}
       >
-        {children}
+        <Outlet />  {/* Route فعلی اینجا رندر می‌شود */}
       </Container>
 
-      <Box sx={{ mt: 'auto' }}> {/* این باعث می‌شود فوتر به پایین منتقل شود */}
+      {/* همیشه Footer */}
+      <Box sx={{ mt: 'auto' }}>
         <Footer />
       </Box>
     </Box>
